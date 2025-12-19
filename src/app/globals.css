@@ -1,26 +1,353 @@
 @import "tailwindcss";
 
+/* =========================
+  TOKENS (CSS Variables)
+  ========================= */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #ffffff;
+  --bg-soft: #f6f7fb;
+  --panel: #ffffff;
+  --panel-2: #f3f4f6;
+  --text: #0b1220;
+  --muted: #5b6472;
+
+  --line: rgba(15, 23, 42, 0.14);
+
+  --brand: #f5c400;         /* amarelo */
+  --brand-2: #ffdf4d;
+
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+  --glow: 0 0 0 1px rgba(245, 196, 0, 0.25), 0 0 24px rgba(245, 196, 0, 0.18);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Dark (preto + amarelo) */
+:root[data-theme="dark"] {
+  --bg: #050505;
+  --bg-soft: #0a0a0a;
+  --panel: rgba(255, 255, 255, 0.06);
+  --panel-2: rgba(255, 255, 255, 0.08);
+  --text: #f1f5f9;
+  --muted: rgba(241, 245, 249, 0.72);
+
+  --line: rgba(255, 255, 255, 0.10);
+
+  --brand: #f5c400;
+  --brand-2: #ffd84a;
+
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+  --glow: 0 0 0 1px rgba(245, 196, 0, 0.25), 0 0 30px rgba(245, 196, 0, 0.22);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base */
+html, body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================
+  CLASSES DE DESIGN (fixam o visual sem “bg-white” hardcoded)
+  ========================= */
+@layer components {
+  .pt-bg {
+    background: radial-gradient(1200px 600px at 25% 25%, rgba(245, 196, 0, 0.09), transparent 60%),
+                radial-gradient(900px 450px at 70% 35%, rgba(245, 196, 0, 0.06), transparent 60%),
+                var(--bg);
+  }
+
+  .pt-topbar {
+    background: color-mix(in oklab, var(--panel) 55%, transparent);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(10px);
+  }
+
+  .pt-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  /* ✅ ADICIONADO: usado no UploadCard */
+  .pt-surface {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .pt-chip {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  .pt-muted {
+    color: var(--muted);
+  }
+
+  .pt-btn {
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+  }
+
+  .pt-btn:hover {
+    border-color: color-mix(in oklab, var(--brand) 40%, var(--line));
+  }
+
+  .pt-btn-primary {
+    background: var(--brand);
+    color: #0b0b0b;
+    border: 1px solid color-mix(in oklab, var(--brand) 60%, #000);
+    box-shadow: var(--glow);
+  }
+
+  .pt-btn-primary:hover {
+    background: var(--brand-2);
+  }
+
+  /* Faz inputs/file/select ficarem coerentes em ambos temas */
+  .pt-input {
+    background: color-mix(in oklab, var(--panel) 75%, transparent);
+    border: 1px solid var(--line);
+    color: var(--text);
+  }
+
+  /* ✅ melhora o input file (principalmente no dark) */
+  input[type="file"] {
+    color: var(--text);
+  }
+}
+/* =========================
+  FIX: <select>/<option> no tema escuro
+  (apenas dark)
+  ========================= */
+:root[data-theme="dark"] select.pt-input,
+:root[data-theme="dark"] select.pt-input option {
+  background-color: #0a0a0a; /* mesmo "bg-soft" do dark */
+  color: #f1f5f9;           /* mesmo "text" do dark */
+}
+
+/* =========================
+  ✅ FIX DO CHAT (visibilidade / sem transparência)
+  - Não altera o painel inteiro; só força opacidade no "container do chat"
+  ========================= */
+
+/* Tokens só do chat */
+:root {
+  --pt-chat-bg: rgba(255, 255, 255, 0.98);
+  --pt-chat-text: #0b1220;
+  --pt-chat-border: rgba(15, 23, 42, 0.18);
+}
+
+:root[data-theme="dark"] {
+  --pt-chat-bg: rgba(10, 10, 10, 0.94);
+  --pt-chat-text: #f1f5f9;
+  --pt-chat-border: rgba(255, 255, 255, 0.14);
+}
+
+/* Pega vários padrões comuns de "janela flutuante" sem você mexer no componente */
+.pt-chat,
+.pt-chat * {
+  color: inherit;
+}
+
+/* Janela/painel do chat (tenta acertar por classes comuns) */
+.pt-chat,
+.pt-chat-panel,
+.pt-chat-window,
+.chat-window,
+.chat-panel,
+[data-pt-chat="panel"],
+[data-pt-chat="window"],
+[data-chat="panel"],
+[data-chat="window"] {
+  background: var(--pt-chat-bg) !important;
+  color: var(--pt-chat-text) !important;
+  border: 1px solid var(--pt-chat-border) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Header do chat (se existir) */
+.pt-chat-header,
+.chat-header,
+[data-pt-chat="header"],
+[data-chat="header"] {
+  background: color-mix(in oklab, var(--pt-chat-bg) 90%, transparent) !important;
+  border-bottom: 1px solid var(--pt-chat-border) !important;
+  color: var(--pt-chat-text) !important;
+}
+
+/* Área de mensagens (se existir) */
+.pt-chat-messages,
+.chat-messages,
+[data-pt-chat="messages"],
+[data-chat="messages"] {
+  background: transparent !important;
+  color: var(--pt-chat-text) !important;
+}
+
+/* Input do chat (digitação) */
+.pt-chat input,
+.pt-chat textarea,
+.chat-window input,
+.chat-window textarea,
+[data-pt-chat="panel"] input,
+[data-pt-chat="panel"] textarea,
+[data-chat="panel"] input,
+[data-chat="panel"] textarea {
+  background: color-mix(in oklab, var(--pt-chat-bg) 85%, transparent) !important;
+  color: var(--pt-chat-text) !important;
+  border: 1px solid var(--pt-chat-border) !important;
+}
+
+/* Placeholder do input */
+.pt-chat input::placeholder,
+.pt-chat textarea::placeholder,
+.chat-window input::placeholder,
+.chat-window textarea::placeholder {
+  color: color-mix(in oklab, var(--pt-chat-text) 55%, transparent) !important;
+}
+@layer components {
+  /* =========================
+    CHAT (segue data-theme do <html>)
+    ========================= */
+
+  .pt-chat-drawer {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  :root[data-theme="dark"] .pt-chat-drawer {
+    background: rgba(0, 0, 0, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(10px);
+  }
+
+  .pt-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in oklab, var(--panel) 85%, transparent);
+  }
+
+  :root[data-theme="dark"] .pt-chat-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .pt-chat-title {
+    color: var(--text);
+  }
+
+  .pt-chat-sub {
+    color: var(--muted);
+  }
+
+  .pt-chat-btn {
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: color-mix(in oklab, var(--panel) 70%, transparent);
+    color: var(--text);
+  }
+
+  .pt-chat-btn:hover {
+    border-color: color-mix(in oklab, var(--brand) 40%, var(--line));
+  }
+
+  /* Bubbles */
+  .pt-chat-bubble-user {
+    background: var(--brand);
+    color: #0b0b0b;
+  }
+
+  .pt-chat-bubble-assistant {
+    background: color-mix(in oklab, var(--panel-2) 92%, transparent);
+    border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+    color: var(--text);
+  }
+
+  :root[data-theme="dark"] .pt-chat-bubble-assistant {
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: rgba(241, 245, 249, 0.92);
+  }
+
+  .pt-chat-footer {
+    border-top: 1px solid var(--line);
+    background: color-mix(in oklab, var(--panel) 88%, transparent);
+  }
+
+  :root[data-theme="dark"] .pt-chat-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .pt-chat-input {
+    background: transparent;
+    color: var(--text);
+  }
+
+  .pt-chat-input::placeholder {
+    color: color-mix(in oklab, var(--muted) 70%, transparent);
+  }
+
+  :root[data-theme="dark"] .pt-chat-input {
+    color: rgba(241, 245, 249, 0.92);
+  }
+
+  :root[data-theme="dark"] .pt-chat-input::placeholder {
+    color: rgba(241, 245, 249, 0.40);
+  }
+
+  .pt-chat-hint {
+    color: var(--muted);
+  }
+
+  :root[data-theme="dark"] .pt-chat-hint {
+    color: rgba(241, 245, 249, 0.40);
+  }
+
+  /* Send button states */
+  .pt-chat-send {
+    background: var(--brand);
+    color: #0b0b0b;
+    border: 1px solid color-mix(in oklab, var(--brand) 60%, #000);
+    box-shadow: var(--glow);
+  }
+
+  .pt-chat-send:hover {
+    background: var(--brand-2);
+  }
+
+  .pt-chat-send-disabled {
+    background: color-mix(in oklab, var(--panel-2) 70%, transparent);
+    color: color-mix(in oklab, var(--muted) 70%, transparent);
+    border: 1px solid var(--line);
+    cursor: not-allowed;
+    opacity: 0.9;
+  }
+
+  :root[data-theme="dark"] .pt-chat-send-disabled {
+    background: rgba(255, 255, 255, 0.10);
+    color: rgba(241, 245, 249, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  /* Error */
+  .pt-chat-error {
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.10);
+    color: rgba(185, 28, 28, 0.95);
+  }
+
+  :root[data-theme="dark"] .pt-chat-error {
+    color: rgba(254, 202, 202, 0.95);
+  }
 }

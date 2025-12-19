@@ -1,7 +1,9 @@
-import { AnalyzeResponse } from "@/lib/types";
+import type { AnalyzeResponse } from "@/lib/types";
 
 export function InsightsPanel({ data }: { data: AnalyzeResponse | null }) {
   if (!data) return null;
+  if (!data.ok) return null;
+  if (data.stage !== "analysis") return null;
 
   return (
     <div className="rounded-xl border border-gold/30 bg-gold/10 p-6">

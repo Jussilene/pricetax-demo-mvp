@@ -1,8 +1,10 @@
-import { AnalyzeResponse } from "@/lib/types";
+import type { AnalyzeResponse } from "@/lib/types";
 import { formatBRL, formatPercent } from "@/lib/format";
 
 export function KpiCards({ data }: { data: AnalyzeResponse | null }) {
   if (!data) return null;
+  if (!data.ok) return null;
+  if (data.stage !== "analysis") return null;
 
   const { receita_liquida, total_gastos_top10, concentracao_admin } = data.kpis;
 
@@ -29,4 +31,3 @@ export function KpiCards({ data }: { data: AnalyzeResponse | null }) {
     </div>
   );
 }
-    

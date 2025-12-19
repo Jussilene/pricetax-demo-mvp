@@ -1,0 +1,20 @@
+{
+  "margem_liquida_pct": {
+    "bom": 10,
+    "ok": 5,
+    "alerta": 0,
+    "descricao": "Margem líquida saudável para empresas de porte médio"
+  },
+  "margem_bruta_pct": {
+    "bom": 35,
+    "ok": 25,
+    "alerta": 15,
+    "descricao": "Margem bruta comum em empresas operacionais"
+  },
+  "desp_admin_sobre_receita_pct": {
+    "bom": 8,
+    "ok": 12,
+    "alerta": 18,
+    "descricao": "Percentual de despesas administrativas sobre a receita"
+  }
+}
